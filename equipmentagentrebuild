@@ -1,0 +1,252 @@
+{
+  "name": "Gym Equipment Manager",
+  "nodes": [
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        320,
+        240
+      ],
+      "id": "2a0d8222-460f-4930-826c-bff27bc105b8",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "MFNw5kYhf4msNEuh",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $execution.id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        440,
+        240
+      ],
+      "id": "5d6065ff-f636-4fcf-8f6a-70c894da6448",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "equipment_items",
+        "limit": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Limit', ``, 'number') }}",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "equipment_group",
+              "condition": "eq",
+              "keyValue": "={{ $fromAI('equipment_group_id', ``, 'string') }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        660,
+        480
+      ],
+      "id": "26a04c3c-3953-47c4-8571-621e4a926565",
+      "name": "Get Equipment Items",
+      "credentials": {
+        "supabaseApi": {
+          "id": "cZFskEezQwpVCWrP",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.query }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        340,
+        20
+      ],
+      "id": "31bfd434-ed29-475c-90a2-423fb7f40e23",
+      "name": "Equipment Manager"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "equipment_groups",
+        "limit": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Limit', ``, 'number') }}",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "area",
+              "condition": "eq",
+              "keyValue": "536ade3b-2f55-4f91-ada8-5ff851caf43f"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        500,
+        480
+      ],
+      "id": "c532e190-d7c3-4187-9b19-2306d8ce998f",
+      "name": "Get Equipment Group",
+      "credentials": {
+        "supabaseApi": {
+          "id": "cZFskEezQwpVCWrP",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "equipment_items",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "item_name",
+              "fieldValue": "={{ $fromAI('item_name', ``, 'string') }}"
+            },
+            {
+              "fieldId": "item_description",
+              "fieldValue": "={{ $fromAI('item_description', ``, 'string') }}"
+            },
+            {
+              "fieldId": "equipment_group",
+              "fieldValue": "={{ $fromAI('equipmentgroupID', ``, 'string') }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        860,
+        260
+      ],
+      "id": "9f3425e0-9ead-4c14-a11d-68437fbdad22",
+      "name": "Create Equipment Item",
+      "credentials": {
+        "supabaseApi": {
+          "id": "cZFskEezQwpVCWrP",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "query"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "81d0ae0b-2443-4976-b1f2-1b30c9461297",
+      "name": "When Executed by Another Workflow"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Equipment Manager",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Equipment Manager",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Equipment Items": {
+      "ai_tool": [
+        [
+          {
+            "node": "Equipment Manager",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Equipment Group": {
+      "ai_tool": [
+        [
+          {
+            "node": "Equipment Manager",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Equipment Item": {
+      "ai_tool": [
+        [
+          {
+            "node": "Equipment Manager",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Equipment Manager",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "ce63e93f-9709-4448-9dde-22483ee1262a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "543bb6344a1a6965e93dc1694c34ea49c0371f2ea5cc83a1496c63d0150feec0"
+  },
+  "id": "h90RhJbp1azD8uhM",
+  "tags": []
+}
